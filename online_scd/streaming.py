@@ -35,6 +35,9 @@ class InputFrameGenerator(object):
 
 
 class StreamingSlidingWindowCmn:
+    '''
+    on-line CMN
+    '''
     def __init__(self, num_feats, cmn_window=600):
         self.cmn_window = cmn_window
         self.rolling_position = 0
@@ -52,12 +55,13 @@ class AudioStream2MelSpectrogram:
     def __init__(self, sample_rate=16000, num_fbanks=40, cmn_window=600):
         self.sample_rate = sample_rate
         self.num_fbanks = num_fbanks
+        # InputFrameGenerator(blocksize, stepsize)
         self.input_frame_generator = InputFrameGenerator(400, 160)
         self.cmn = StreamingSlidingWindowCmn(num_fbanks, cmn_window)
 
     def process_audio(self, audio):
         for frames in self.input_frame_generator.frames(audio):
-            single_feat = librosa.feature.melspectrogram(frames, sr=self.sample_rate,
+            single_feat = librosa.feature.melspectrogram(y=frames, sr=self.sample_rate,
                                             center=False,
                                             n_fft=int(2.5*self.sample_rate/100.0), hop_length=self.sample_rate//100,
                                             fmin=40, fmax=self.sample_rate//2-400, n_mels=self.num_fbanks)
